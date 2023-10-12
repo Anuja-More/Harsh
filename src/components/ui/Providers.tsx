@@ -5,7 +5,7 @@ import {
   QueryClientProvider,
 } from '@tanstack/react-query'
 import { httpBatchLink } from '@trpc/client'
-import { absoluteUrl } from '@/lib/utils'
+import { absoluteUrl } from '../../lib/utils'
 import { PropsWithChildren, useState } from 'react'
 const Providers = ({children}:PropsWithChildren) => {
  const [queryClient] = useState(() => new QueryClient())

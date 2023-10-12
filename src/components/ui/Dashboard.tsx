@@ -8,13 +8,28 @@ import {
   Plus,
   Trash,
 } from 'lucide-react'
+import { useState } from "react"
 import { format } from 'date-fns'
 import { Button } from "./button"
 import Skeleton from "react-loading-skeleton"
 import Link from "../../../node_modules/next/link"
 
 const Dashboard = () => {
+    const [currentlyDeletingFile, setCurrentlyDeletingFile] = useState<string | null>(null) // state for adding loader on trash button of specfic id that is getting deleted 
+    const utils = trpc.useContext()
     const {data: files, isLoading} = trpc.getUserFiles.useQuery()
+    const {mutate: deleteFile} = trpc.deleteFile.useMutation({
+      onSuccess: () => {
+        utils.getUserFiles.invalidate()
+        //again calls the getuserapi
+      },
+      onMutate({id}){
+        setCurrentlyDeletingFile(id)
+      },
+      onSettled(){
+       setCurrentlyDeletingFile(null) 
+      }
+    })
   return (
      <main className="mx-auto max-w-7xl md:p-10">
      <div className="mt-8 flex flex-col items-start justify-between gap-4 border-gray-200 pb-5 sm:flex-row sm:items-center sm:gap-0">
@@ -61,10 +76,13 @@ const Dashboard = () => {
                   </div>
 
                   <Button
+                    onClick={()=> deleteFile({id: file.id})}
                     size='sm'
                     className='w-full'
                     variant='destructive'>
-                     <Trash className='h-4 w-4' />
+                      {currentlyDeletingFile === file.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : <Trash className='h-4 w-4' />}
                   </Button>
                 </div>
               </li>

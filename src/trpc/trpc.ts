@@ -8,7 +8,10 @@ const isAuth = middleware(async(opts)=>{
     const user = getUser()
 
     if(!user || !user.id) {
-        throw new TRPCError({code: "UNAUTHORIZED"})
+       throw new TRPCError({
+    code: "UNAUTHORIZED",
+    message: "User is not authenticated or the session has expired."
+});
     }
 
     return opts.next({
